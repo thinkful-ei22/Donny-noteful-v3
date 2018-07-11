@@ -195,7 +195,19 @@ describe('Notes API resource', function() {
           expect(_data).to.be.null;
         });
     });
+ 
+    it('should return 500 when trying to delete nonexistant/nonsense id', function() {
+ 
+      let nonsense;
+      return Note
+        .findOne()
+        .then(res => {
+          return chai.request(app).delete(`/api/notes/${nonsense}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(500);
+        });
+    });
+
   });
-
-
 });

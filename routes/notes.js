@@ -112,6 +112,7 @@ router.delete('/:id', (req, res, next) => {
   return Note.findByIdAndRemove(id)
     .then(()=>{
       res.status(204).end();
-    });
+    })
+    .catch(err => next(err));
 });
 module.exports = router;
