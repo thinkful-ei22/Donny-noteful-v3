@@ -9,116 +9,110 @@ const router = express.Router();
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
 
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-      const {searchTerm} = req.query;
-      //let filter={};
-
-      if (searchTerm) {
-        return Note.find(
-          {$or:
-            [{title: {$regex: searchTerm}},{content: {$regex: searchTerm}}]
-          })
-          .sort('_id');
-      }
-      return Note.find({}).sort('_id');
-    }) 
+   
+  const searchTerm = req.query.searchTerm;
+  if (searchTerm) {
+    return Note.find(
+      {$or:
+            [
+              {title: {$regex: searchTerm, $options: 'i'}},
+              {content: {$regex: searchTerm, $options: 'i'}}
+            ]
+      })
+      .sort('_id');
+  }
+  return Note.find().sort('_id')
+    
     .then(results => {
-      console.log(results);
-      res.json(results);
-    })
-    .then(() => {
-      return mongoose.disconnect();
+      if(results){
+        res.json(results);
+      }
+      else{
+        next();
+      }
     })
     .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error(err);
+      next(err);
     });
-
-
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-      const searchId=req.params.id;
-  
-      return Note.findById(searchId);
-    })    
-    .then(results => {
-      res.json(results);
-    })
-    .then(() => {
-      return mongoose.disconnect();
+ 
+  const id = req.params.id;
+  if(!(mongoose.Types.ObjectId.isValid(id))){
+    return next('error');
+  }
+  return Note.findById(id)
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
     })
     .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error(err);
+      next(err);
     });
-
 });
+
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-      
-      const {title, content} = req.body;
-      const newNote = {
-        title, content
-      };
-      
-      return Note.create(newNote);
-    })
+  const {title, content} = req.body;
+  const newNote = {
+    title: title, 
+    content: content, 
+  };
+  if (!newNote.title || !newNote.content) {
+    const err = new Error('Missing `title` or `content` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  return Note.create(newNote)
     .then(results => {
-      res.json(results);
+      if (results){
+        res.location(`${req.originalUrl}/${res.id}`).status(201).json(results);
+      } else {
+        next();
+      }
     })
-    .then(() => {
-      return mongoose.disconnect();
-    })
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error(err);
-    });
-
+    .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-    
-      const searchId=req.params.id;
-      const {title,content} = req.body;
+  const id = req.params.id;
+  const {title, content} = req.body;
+  const updatedNote = {
+    title: title, 
+    content: content, 
+  };
+  if (!updatedNote.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
 
-      const UpdateObj = {
-        title:title,
-        content:content
-      };
-
-      return Note.findByIdAndUpdate(searchId,UpdateObj,{new:true});
-        
-    })     
+  return Note.findByIdAndUpdate(id, updatedNote)
     .then(results => {
-      res.json(results);
+      if (results){
+        res.json(results);
+      } else {
+        next();
+      }
     })
-    .then(() => {
-      return mongoose.disconnect();
-    })
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error(err);
-    });
+    .catch(err => next(err));
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
 
-
-
-  
+  const id = req.params.id;
+  return Note.findByIdAndRemove(id)
+    .then(()=>{
+      res.status(204).end();
+    })
+    .catch(err => next(err));
 });
-
 module.exports = router;
