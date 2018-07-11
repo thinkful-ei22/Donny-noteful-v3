@@ -96,16 +96,7 @@ describe('Notes API resource', function() {
         });
     });
 
-    //test for id that doesn't exist
-    it('should return 404 for id that does not exist', function() {
-      return chai.request(app).get('/api/notes/9999999999999999')
-        .catch(error => {
-          return error.response;
-        })
-        .then(res => {
-          expect(res).to.have.status(404);
-        });
-    });
+
   });
 
 
@@ -137,8 +128,26 @@ describe('Notes API resource', function() {
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
+    it('should return 400 if sent bad/missing fields and info', function() {
+    
+      const badObject = {
+        title: 'whatever man',
+        dog: 'dogs'
+      };
+  
+      return chai.request(app)
+        .post('/api/notes/')
+        .send(badObject)
+        .catch(error => error.response)
+        .then((res) =>{
+          expect(res).to.have.status(400);
+        });
+    });
+
   });
 
+  //UPDATE TEST
   describe('PUT /api/notes/:id', ()=>{
     it('should update a note and return it', ()=>{
       const updatedNote = {

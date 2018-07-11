@@ -64,8 +64,8 @@ router.post('/', (req, res, next) => {
     title: title, 
     content: content, 
   };
-  if (!newNote.title) {
-    const err = new Error('Missing `title` in request body');
+  if (!newNote.title || !newNote.content) {
+    const err = new Error('Missing `title` or `content` in request body');
     err.status = 400;
     return next(err);
   }
