@@ -80,7 +80,7 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const id = req.params.id;
+  const {id} = req.params;
   const {title, content} = req.body;
   const updatedNote = {
     title: title, 
@@ -106,7 +106,7 @@ router.put('/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
 
-  const id = req.params.id;
+  const {id} = req.params;
   return Note.findByIdAndRemove(id)
     .then(()=>{
       res.status(204).end();
