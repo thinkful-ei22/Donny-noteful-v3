@@ -43,11 +43,13 @@ describe('Notes API resource', function() {
       return chai.request(app)
         .get('/api/notes')
         .then(function(_res) {
+
           res = _res;
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('array');
           expect(res.body).to.have.length.of.at.least(1);
+
           return Note.find()
             .then(function(data) {
               expect(res.body).to.have.length(data.length);
@@ -57,7 +59,9 @@ describe('Notes API resource', function() {
    
     //test for getting one note
     it('should return the correct note given id', function () {
+      
       let data;
+      
       // Call the database
       return Note.findOne()
         .then(_data => {
