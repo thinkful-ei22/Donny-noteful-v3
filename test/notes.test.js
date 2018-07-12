@@ -66,8 +66,9 @@ describe('Notes API resource', function() {
       return Note.findOne()
         .then(_data => {
           data = _data;
+         // console.log(data.folderId);
 
-          // Call the API w/ the ID
+          // make request to route
           return chai.request(app).get(`/api/notes/${data.id}`);
         })
         .then(res => {
@@ -77,10 +78,11 @@ describe('Notes API resource', function() {
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
 
-          // 3) then compare database results to API response
+          // 3) then compare response
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
+         // expect(res.body.folderId).to.equal(data.folderId);
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
 
@@ -202,7 +204,7 @@ describe('Notes API resource', function() {
         });
     });
  
-    it('should return 500 when trying to delete nonexistant/nonsense id', function() {
+    it('should return 400 when trying to delete nonexistant/nonsense id', function() {
  
       let nonsense;
       return Note
