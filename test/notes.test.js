@@ -9,7 +9,7 @@ const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
 
-const seedNotes = require('../db/seed/notes');
+const seedNotes = require('../db/seed/notes-test');
 
 const expect = chai.expect;
 
