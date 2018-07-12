@@ -40,7 +40,6 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
  
   const {id} = req.params;
- console.log(Note.findById(id));
   return Note.findById(id)
 
     .then(result => {
