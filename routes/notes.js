@@ -8,32 +8,33 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-
-   
-  const searchTerm = req.query.searchTerm;
+  const {searchTerm} = req.query;
   if (searchTerm) {
-    return Note.find(
+    Note.find(
       {$or:
             [
               {title: {$regex: searchTerm, $options: 'i'}},
               {content: {$regex: searchTerm, $options: 'i'}}
             ]
       })
-      .sort('_id');
-  }
-  return Note.find().sort('_id')
-    
-    .then(results => {
-      if(results){
+      .sort('_id')
+      .then(results => {
         res.json(results);
-      }
-      else{
-        next();
-      }
-    })
-    .catch(err => {
-      next(err);
-    });
+      })
+      .catch(err => {
+        next(err);
+      });
+  } else{
+    Note.find()
+      .sort('_id')
+      .then(results => {
+        res.json(results);
+      })
+      .catch(err => {
+        next(err);
+      });
+  }
+
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
