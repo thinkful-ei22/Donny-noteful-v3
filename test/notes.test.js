@@ -75,7 +75,7 @@ describe('Notes API resource', function() {
           expect(res).to.be.json;
 
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('id','title','content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
 
           // 3) then compare database results to API response
           expect(res.body.id).to.equal(data.id);
@@ -88,7 +88,7 @@ describe('Notes API resource', function() {
     });
 
     //test for nonsense id
-    it('should return 500 given an nonsensical id or query', function() {
+    it('should return 400 given an nonsensical id or query', function() {
     
       const invalidId = 'DONKEYKONG64 FOREVER AND EVER';
 
@@ -96,7 +96,7 @@ describe('Notes API resource', function() {
         .get(`/api/notes/${invalidId}`)
         .catch(error => error.response)
         .then((res) =>{
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(400);
         });
     });
 
@@ -109,7 +109,8 @@ describe('Notes API resource', function() {
     it('should return a new note', ()=>{
       const newNote = {
         'title': 'Big Ups to my hoes in Long Beach',
-        'content': 'Doinks Big Loud Nice Day You Know'
+        'content': 'Doinks Big Loud Nice Day You Know',
+        'folderId':'111111111111111111111102'
       };
       let res;
       return chai.request(app)
@@ -121,7 +122,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id','title','content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
           return Note.findById(res.body.id);
         })
         .then(data =>{
@@ -156,7 +157,8 @@ describe('Notes API resource', function() {
     it('should update a note and return it', ()=>{
       const updatedNote = {
         'title': 'Do you really like to eat cheese?',
-        'content': 'Cheese and cats go together like hands and gloves!'
+        'content': 'Cheese and cats go together like hands and gloves!',
+        'folderId' : '111111111111111111111103'
       };
       return Note
         .findOne()
@@ -170,7 +172,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content','folderId', 'createdAt', 'updatedAt');
           return Note.findById(updatedNote.id)
             .then(data =>{
               expect(updatedNote.id).to.equal(data.id);
@@ -209,7 +211,7 @@ describe('Notes API resource', function() {
           return chai.request(app).delete(`/api/notes/${nonsense}`);
         })
         .then(res => {
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(400);
         });
     });
 
