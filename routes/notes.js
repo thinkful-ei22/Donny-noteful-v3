@@ -39,11 +39,10 @@ router.get('/', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
  
-  const id = req.params.id;
-  if(!(mongoose.Types.ObjectId.isValid(id))){
-    return next('error');
-  }
+  const {id} = req.params;
+ console.log(Note.findById(id));
   return Note.findById(id)
+
     .then(result => {
       if (result) {
         res.json(result);

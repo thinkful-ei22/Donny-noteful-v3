@@ -5,40 +5,22 @@ const { MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
 
-mongoose.connect(MONGODB_URI)
-  .then(() => {
-    const searchTerm = 'Lady Gaga';
-    // let filter;
-
-    // if (searchTerm) {
-    //   filter = searchTerm;
-    // }
-
-    return Note.find({$or:[
-
-      {title: {$regex: searchTerm}},
-      {content:  {$regex: searchTerm}}
-
-    ]}  
-    ).sort({ updatedAt: 'desc' });
-  })    
-  .then(results => {
-    console.log(results);
-  })
-  .then(() => {
-    return mongoose.disconnect();
-  })
-  .catch(err => {
-    console.error(`ERROR: ${err.message}`);
-    console.error(err);
-  });
-
-//FIND NOTE BY ID
 // mongoose.connect(MONGODB_URI)
 //   .then(() => {
-//     const searchId='000000000000000000000004';
-  
-//     return Note.findById(searchId);
+//     const searchTerm = 'Lady Gaga';
+//     // let filter;
+
+//     // if (searchTerm) {
+//     //   filter = searchTerm;
+//     // }
+
+//     return Note.find({$or:[
+
+//       {title: {$regex: searchTerm}},
+//       {content:  {$regex: searchTerm}}
+
+//     ]}  
+//     ).sort({ updatedAt: 'desc' });
 //   })    
 //   .then(results => {
 //     console.log(results);
@@ -50,6 +32,24 @@ mongoose.connect(MONGODB_URI)
 //     console.error(`ERROR: ${err.message}`);
 //     console.error(err);
 //   });
+
+//FIND NOTE BY ID
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    const searchId='000000000000000000000001';
+  
+    return Note.findById(searchId);
+  })    
+  .then(results => {
+    console.log(results);
+  })
+  .then(() => {
+    return mongoose.disconnect();
+  })
+  .catch(err => {
+    console.error(`ERROR: ${err.message}`);
+    console.error(err);
+  });
 
 
 //Create a new note using Note.create
