@@ -1,11 +1,11 @@
 [
-{"title":"My Mom Is A Cat","content":"You'll never believe what I am !", "folderId": "111111111111111111111100"},
-{"title":"What the government doesn't want you to know about cats","content":"Cats Rule, Boys Drool", "folderId": "111111111111111111111100"},
-{"title":"The most boring article about cats you'll ever read","content":"Meow", "folderId": "111111111111111111111100"},
-{"title":"7 things Lady Gaga has in common with cats","content":"E V E R Y T H I N G IS CAT ", "folderId": "111111111111111111111103"},
-{"title":"The most incredible article about cats you'll ever read","content":"E V E R Y T H I N G IS CAT LADY GAGA lady gaga Lady Gaga ", "folderId": "111111111111111111111100"},
-{"title":"10 ways cats can help you live to 100","content":"1. 2. 3. 4. 5. 6. 7. 8. 9. 10. Yup. That's it. ", "folderId": "111111111111111111111100"},
-{"title":"9 reasons you can blame the recession on cats","content":"Everybody wants to be a cat ", "folderId": "111111111111111111111100"},
-{"title":"10 ways marketers are making you addicted to cats","content":"Kittens. :3", "folderId": "111111111111111111111102"},
-{"title":"5 life lessons learned from cats","content":"1. Never\n2. Trust\n3. Anyone\n4. And\n5. Dogs", "folderId": "111111111111111111111102"}
+{"title":"My Mom Is A Cat","content":"You'll never believe what I am !", "folderId": "111111111111111111111100","tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"What the government doesn't want you to know about cats","content":"Cats Rule, Boys Drool", "folderId": "111111111111111111111100", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"The most boring article about cats you'll ever read","content":"Meow", "folderId": "111111111111111111111100", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"7 things Lady Gaga has in common with cats","content":"E V E R Y T H I N G IS CAT ", "folderId": "111111111111111111111103", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"The most incredible article about cats you'll ever read","content":"E V E R Y T H I N G IS CAT LADY GAGA lady gaga Lady Gaga ", "folderId": "111111111111111111111100", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"10 ways cats can help you live to 100","content":"1. 2. 3. 4. 5. 6. 7. 8. 9. 10. Yup. That's it. ", "folderId": "111111111111111111111100", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"9 reasons you can blame the recession on cats","content":"Everybody wants to be a cat ", "folderId": "111111111111111111111100", "tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"10 ways marketers are making you addicted to cats","content":"Kittens. :3", "folderId": "111111111111111111111102","tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]},
+{"title":"5 life lessons learned from cats","content":"1. Never\n2. Trust\n3. Anyone\n4. And\n5. Dogs", "folderId": "111111111111111111111102","tags": ["222222222222222222222200", "222222222222222222222201", "222222222222222222222202"]}
 ]
