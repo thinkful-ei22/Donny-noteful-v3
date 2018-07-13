@@ -77,7 +77,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt', 'tags');
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
@@ -134,7 +134,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt','tags');
           return Note.findById(res.body.id);
         })
         .then(data =>{
@@ -185,7 +185,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id', 'title', 'content','folderId', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content','folderId', 'createdAt', 'updatedAt', 'tags');
           return Note.findById(updatedNote.id)
             .then(data =>{
               expect(updatedNote.id).to.equal(data.id);
