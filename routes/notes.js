@@ -8,42 +8,36 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const {searchTerm, folderId, tagId} = req.query;
-  const filter = {};
+
+  const { searchTerm, folderId, tagId } = req.query;
+
+  let filter = {};
+
+  if (searchTerm) {
+    const regex = new RegExp(searchTerm, 'i');
+    filter.$or = [{ 'title': regex }, { 'content': regex }];
+  }
+
   if (folderId) {
     filter.folderId = folderId;
   }
-  if(tagId){
-    filter.tagId = tagId;
+
+  if (tagId) {
+    filter.tags = tagId;
   }
 
-  if (searchTerm) {
-    Note.find(
-      {$or:
-            [ {title: {$regex: searchTerm, $options: 'i'}},
-              {content: {$regex: searchTerm, $options: 'i'}} ]
-      })
-      .find(filter)
-      .sort('_id')
-      .then(results => {
-        res.json(results);
-      })
-      .catch(err => {
-        next(err);
-      });
-  } else{
-    Note.find(filter)
-      .populate('tags')
-      .sort('_id')
-      .then(results => {
-        res.json(results);
-      })
-      .catch(err => {
-        next(err);
-      });
-  }
 
+  Note.find(filter)
+    .populate('tags')
+    .sort({ updatedAt: 'desc' })
+    .then(results => {
+      res.json(results);
+    })
+    .catch(err => {
+      next(err);
+    });
 });
+
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
