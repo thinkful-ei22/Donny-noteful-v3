@@ -8,10 +8,13 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const {searchTerm, folderId} = req.query;
-  const folderFilter = {};
+  const {searchTerm, folderId, tagId} = req.query;
+  const filter = {};
   if (folderId) {
-    folderFilter.folderId = folderId;
+    filter.folderId = folderId;
+  }
+  if(tagId){
+    filter.tagId = tagId;
   }
 
   if (searchTerm) {
@@ -20,7 +23,7 @@ router.get('/', (req, res, next) => {
             [ {title: {$regex: searchTerm, $options: 'i'}},
               {content: {$regex: searchTerm, $options: 'i'}} ]
       })
-      .find(folderFilter)
+      .find(filter)
       .sort('_id')
       .then(results => {
         res.json(results);
@@ -29,7 +32,8 @@ router.get('/', (req, res, next) => {
         next(err);
       });
   } else{
-    Note.find(folderFilter)
+    Note.find(filter)
+      .populate('tags')
       .sort('_id')
       .then(results => {
         res.json(results);
@@ -51,7 +55,7 @@ router.get('/:id', (req, res, next) => {
     return next(err);
   }
   return Note.findById(id)
-
+    .populate('tags')
     .then(result => {
       if (result) {
         res.json(result);
@@ -67,11 +71,12 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-  const {title, content, folderId} = req.body;
+  const {title, content, folderId, tags = []} = req.body;
   const newNote = {
     title: title, 
     content: content, 
-    folderId: folderId
+    folderId: folderId,
+    tags : tags
   };
 
     /*validation - check if id is valid and if exists*/
@@ -85,6 +90,16 @@ router.post('/', (req, res, next) => {
     const err = new Error('Missing `title` or `folderId` in the request body');
     err.status = 400;
     return next(err);
+  }
+
+  if(newNote.tags){
+    newNote.tags.forEach(tag => {
+      if (!mongoose.Types.ObjectId.isValid(tag)) {
+        const err = new Error('The tag `id` is not valid');
+        err.status = 400;
+        return next(err);
+      }
+    });
   }
 
   return Note.create(newNote)
@@ -101,11 +116,12 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const {id} = req.params;
-  const {title, content, folderId} = req.body;
+  const {title, content, folderId, tags = []} = req.body;
   const updatedNote = {
     title: title, 
     content: content, 
-    folderId: folderId
+    folderId: folderId,
+    tags : tags
   };
 
   /*validation - check if id is valid and if exists*/

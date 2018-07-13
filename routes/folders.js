@@ -3,6 +3,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 const Note = require('../models/note');
 const { MONGODB_URI } = require('../config');
 const router = express.Router();

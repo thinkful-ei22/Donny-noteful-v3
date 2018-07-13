@@ -84,4 +84,54 @@ router.post('/', (req, res, next) => {
 });
 
 
+//Update - Tag
+
+router.put('/:id', (req,res,next) => {
+  const {id} = req.params;
+  const {name} = req.body;
+  const updatedTag = { id, name };
+
+  if (!updatedTag.name) {
+    const err = new Error('Missing `name` in the request body');
+    err.status = 400;
+    return next(err);
+  }
+
+
+  Tag.findByIdAndUpdate(id, updatedTag, {new:true})
+    .then( results => {
+      if (results){
+        res.json(results);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      if (err.code === 11000) {
+        err = new Error('The tag name already exists');
+        err.status = 400;
+      }
+      next(err);
+    });
+});
+
+
+//DELETE - tag
+
+router.delete('/:id', (req,res, next) => {
+
+  const {id} = req.params;
+  
+  Tag
+    .findByIdAndRemove(id)
+    .then( () => {
+      return Note.updateMany({tags:id},{$pull : {tags:id}});
+    })
+    .then( (result) => {
+      res.json(result).status(200).end();
+    })
+    .catch(err => {
+      next(err);
+    }); 
+});
 module.exports = router;
