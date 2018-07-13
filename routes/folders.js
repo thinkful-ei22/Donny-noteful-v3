@@ -9,13 +9,13 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const searchTerm = req.query.searchTerm;
-  if (searchTerm) {
-    return Folder.find( {name: {$regex: searchTerm, $options: 'i'}})
-      .sort('_id');
-  }
+//   const searchTerm = req.query.searchTerm;
+//   if (searchTerm) {
+//     return Folder.find( {name: {$regex: searchTerm, $options: 'i'}})
+//       .sort('_id');
+//   }
   //if no search term, then do this:
-  return Folder.find().sort('_id')
+  Folder.find().sort('_id')
       
     .then(results => {
       if(results){
@@ -36,7 +36,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req,res, next) =>{
   const id = req.params.id;
   console.log(req.params.id);
-  return Folder.findById(id)
+  Folder.findById(id)
     .then(result => {
       if (result) {
         res.json(result);
@@ -59,19 +59,13 @@ router.post('/', (req,res,next) => {
     name: name
   };
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
-
   if (!newFolder.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
   }
 
-  return Folder.create(newFolder)
+  Folder.create(newFolder)
     .then( results => {
       if (results){
         res.location(`${req.originalUrl}/${res.id}`).status(201).json(results);
@@ -106,7 +100,7 @@ router.put('/:id',(req,res,next) => {
     return next(err);
   }
 
-  return Folder.findByIdAndUpdate(id, updatedFolder, {new:true})
+  Folder.findByIdAndUpdate(id, updatedFolder, {new:true})
     .then( results => {
       if (results){
         console.log(results);
@@ -146,8 +140,13 @@ router.delete('/:id', (req,res,next) => {
     }
     else {
       Note.deleteMany({ folderId : id })
-        .then( () => Folder.findByIdAndRemove(id)) 
-        .then( () => res.status(204).end())
+        .then( () => {
+          return Folder.findByIdAndRemove(id);
+        }) 
+        .then( (result) => {
+          res.json(result).status(204).end();
+         
+        })
         .catch(err => {
           next(err);
         });
