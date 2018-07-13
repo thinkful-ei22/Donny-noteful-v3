@@ -14,7 +14,6 @@ const seedNotes = require('../db/seed/notes-test');
 const seedFolders = require('../db/seed/folders');
 
 const expect = chai.expect;
-
 chai.use(chaiHttp);
 
 
@@ -135,6 +134,60 @@ describe('Folders API resource', function() {
         });
     });
 
+  }); //end POST TEST
+
+  //PUT TEST
+  describe('PUT /api/folders/:id', function () {
+
+    it('should update folder name given a valid id', function () {
+      const updateName = { 'name': 'Bogandoff' };
+      let data;
+      return Folder.findOne()
+        .then(_data => {
+          data = _data;
+          return chai.request(app)
+            .put(`/api/folders/${data.id}`)
+            .send(updateName);
+        })
+        .then(function (res) {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt');
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(updateName.name);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+        });
+    });
+  
+
+  }); //End PUT
+
+  //DELETE TEST
+
+  describe('Deletes folder', function () {
+
+    it('should delete an existing document', function () {
+      let data;
+      return Folder.findOne()
+        .then(_data => {
+          data = _data;
+          return chai.request(app).delete(`/api/folders/${data.id}`);
+        })
+        .then(function (res) {
+          expect(res).to.have.status(200); //i'm returning the deleted object just so I can see it :3
+        });
+      
+    });
+  });
+
+  it('should return 404 error message if trying to delete an nonexistant folder', function () {
+    let nonexistantId = '911111111111666111111666';
+   
+    return chai.request(app).delete(`/api/folders/${nonexistantId}`)
+      .then(function (res) {
+        expect(res).to.have.status(404);  
+      });    
   });
 
 
