@@ -8,8 +8,10 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder = require('../models/folder');
 
 const seedNotes = require('../db/seed/notes-test');
+const seedFolders = require('../db/seed/folders');
 
 const expect = chai.expect;
 
@@ -24,7 +26,11 @@ describe('Notes API resource', function() {
   });
 
   beforeEach(function () {
-    return Note.insertMany(seedNotes);
+    return Note.insertMany(seedNotes)
+      .then( () => {
+       // console.log('seeding folders');
+        return Folder.insertMany(seedFolders);    
+      });
   });
 
   afterEach(function () {
@@ -38,7 +44,7 @@ describe('Notes API resource', function() {
   //GET ALL NOTES
   describe('GET /api/notes', function () {
     //test for all notes
-    it('should return all notes', function() {
+    it('should return all the notes', function() {
       let res;
       return chai.request(app)
         .get('/api/notes')
@@ -48,7 +54,6 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length.of.at.least(1);
 
           return Note.find()
             .then(function(data) {
@@ -59,36 +64,45 @@ describe('Notes API resource', function() {
    
     //test for getting one note
     it('should return the correct note given id', function () {
-      
+
       let data;
-      
       // Call the database
       return Note.findOne()
         .then(_data => {
           data = _data;
-
-          // Call the API w/ the ID
+          // console.log(data.folderId);
           return chai.request(app).get(`/api/notes/${data.id}`);
         })
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
-
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('id','title','content', 'createdAt', 'updatedAt');
-
-          // 3) then compare database results to API response
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
-          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
-          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+          // expect(res.body.folderId).to.equal(data.folderId);
 
         });
     });
 
+
+    //test for getting folderId from querystring
+    it('should return the correct folder given valid querystring for folderId', function() {
+      let data;
+      Note.findOne()
+        .then(_data => {
+          data=_data;
+          return chai.request(app).get(`/api/notes?folderId=${data.folderId}`);  
+        }) 
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+        });
+    });
+
     //test for nonsense id
-    it('should return 500 given an nonsensical id or query', function() {
+    it('should return 400 BAD REQUEST given an nonsensical id or query', function() {
     
       const invalidId = 'DONKEYKONG64 FOREVER AND EVER';
 
@@ -96,11 +110,9 @@ describe('Notes API resource', function() {
         .get(`/api/notes/${invalidId}`)
         .catch(error => error.response)
         .then((res) =>{
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(400);
         });
     });
-
-
   });
 
 
@@ -109,7 +121,8 @@ describe('Notes API resource', function() {
     it('should return a new note', ()=>{
       const newNote = {
         'title': 'Big Ups to my hoes in Long Beach',
-        'content': 'Doinks Big Loud Nice Day You Know'
+        'content': 'Doinks Big Loud Nice Day You Know',
+        'folderId':'111111111111111111111102'
       };
       let res;
       return chai.request(app)
@@ -121,7 +134,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id','title','content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
           return Note.findById(res.body.id);
         })
         .then(data =>{
@@ -132,6 +145,7 @@ describe('Notes API resource', function() {
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
 
     it('should return 400 if sent bad/missing fields and info', function() {
     
@@ -156,7 +170,8 @@ describe('Notes API resource', function() {
     it('should update a note and return it', ()=>{
       const updatedNote = {
         'title': 'Do you really like to eat cheese?',
-        'content': 'Cheese and cats go together like hands and gloves!'
+        'content': 'Cheese and cats go together like hands and gloves!',
+        'folderId' : '111111111111111111111103'
       };
       return Note
         .findOne()
@@ -170,7 +185,7 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content','folderId', 'createdAt', 'updatedAt');
           return Note.findById(updatedNote.id)
             .then(data =>{
               expect(updatedNote.id).to.equal(data.id);
@@ -200,7 +215,7 @@ describe('Notes API resource', function() {
         });
     });
  
-    it('should return 500 when trying to delete nonexistant/nonsense id', function() {
+    it('should return 400 when trying to delete nonexistant/nonsense id', function() {
  
       let nonsense;
       return Note
@@ -209,7 +224,7 @@ describe('Notes API resource', function() {
           return chai.request(app).delete(`/api/notes/${nonsense}`);
         })
         .then(res => {
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(400);
         });
     });
 
