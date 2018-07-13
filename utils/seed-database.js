@@ -1,3 +1,4 @@
+
 'use strict';
 
 const mongoose = require('mongoose');
@@ -5,9 +6,11 @@ const mongoose = require('mongoose');
 const { MONGODB_URI } = require('../config');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 
 const seedNotes = require('../db/seed/notes-test');
 const seedFolders = require('../db/seed/folders');
+const seedTags = require('../db/seed/tags');
 
 mongoose.connect(MONGODB_URI)
   .then(() => mongoose.connection.db.dropDatabase())
@@ -16,14 +19,14 @@ mongoose.connect(MONGODB_URI)
       Note.insertMany(seedNotes),
       Folder.insertMany(seedFolders),
       Folder.createIndexes(),
+      Tag.insertMany(seedTags),
+      Tag.createIndexes()
     ]);
   })
   .then(results => {
-    console.info(`Inserted ${results.length} Notes`);
+    console.info(`Inserted ${results.length} Items`);
   })
   .then(() => mongoose.disconnect())
   .catch(err => {
     console.error(err);
   });
-
-  

@@ -23,9 +23,11 @@ app.use(express.json());
 
 const notesRouter = require('./routes/notes');
 const foldersRouter = require('./routes/folders');
+const tagsRouter = require('./routes/tags');
 // Mount routers
 app.use('/api/notes', notesRouter);
 app.use('/api/folders', foldersRouter);
+app.use('/api/tags', tagsRouter);
 
 // Custom 404 Not Found route handler
 app.use((req, res, next) => {
