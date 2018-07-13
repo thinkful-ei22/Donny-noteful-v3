@@ -144,6 +144,7 @@ router.delete('/:id', (req,res,next) => {
           return Folder.findByIdAndRemove(id);
         }) 
         .then( (result) => {
+            
           res.json(result).status(200).end();
          
         })
