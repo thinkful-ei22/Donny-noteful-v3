@@ -71,7 +71,7 @@ describe('Folders API resource', function() {
           data = _data;
           //console.log(data.folderId);
 
-          // Call the API w/ the ID
+          // Query endpoint
           return chai.request(app).get(`/api/folders/${data.id}`);
         })
         .then(res => {
@@ -91,6 +91,51 @@ describe('Folders API resource', function() {
     });
   }); //end get folder test
 
+  //POST TESTs
+  describe('POST /api/folders', ()=>{
+    it('should return a new folder', ()=>{
+      const newFolder = {
+        'name': 'plans',
+      };
+      let res;
+      return chai.request(app)
+        .post('/api/folders')
+        .send(newFolder)
+        .then((_res)=>{
+          res = _res;
+          expect(res).to.have.status(201);
+          expect(res).to.have.header('location');
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.keys('id','name','createdAt', 'updatedAt');
+          return Folder.findById(res.body.id);
+        })
+        .then(data =>{
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.title).to.equal(data.title);
+          expect(res.body.content).to.equal(data.content);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+        });
+    });
+
+    it('should return 400 if missing name field', function() {
+    
+      const badFolder = {
+        title: 'whatever man',
+        dog: 'dogs'
+      };
+  
+      return chai.request(app)
+        .post('/api/folders/')
+        .send(badFolder)
+        .catch(error => error.response)
+        .then((res) =>{
+          expect(res).to.have.status(400);
+        });
+    });
+
+  });
 
 
 }); //END

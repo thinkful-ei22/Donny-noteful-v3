@@ -78,7 +78,7 @@ describe('Notes API resource', function() {
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
 
-          // 3) then compare response
+          // compare response
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
@@ -90,7 +90,7 @@ describe('Notes API resource', function() {
     });
 
     //test for nonsense id
-    it('should return 400 given an nonsensical id or query', function() {
+    it('should return 400 BAD REQUEST given an nonsensical id or query', function() {
     
       const invalidId = 'DONKEYKONG64 FOREVER AND EVER';
 

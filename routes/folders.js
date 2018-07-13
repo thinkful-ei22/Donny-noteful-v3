@@ -59,12 +59,6 @@ router.post('/', (req,res,next) => {
     name: name
   };
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
-
   if (!newFolder.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
