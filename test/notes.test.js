@@ -8,8 +8,10 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder = require('../models/folder');
 
 const seedNotes = require('../db/seed/notes-test');
+const seedFolders = require('../db/seed/folders');
 
 const expect = chai.expect;
 
@@ -24,7 +26,11 @@ describe('Notes API resource', function() {
   });
 
   beforeEach(function () {
-    return Note.insertMany(seedNotes);
+    return Note.insertMany(seedNotes)
+      .then( () => {
+       // console.log('seeding folders');
+        return Folder.insertMany(seedFolders);    
+      });
   });
 
   afterEach(function () {
@@ -38,7 +44,7 @@ describe('Notes API resource', function() {
   //GET ALL NOTES
   describe('GET /api/notes', function () {
     //test for all notes
-    it('should return all notes', function() {
+    it('should return all the notes', function() {
       let res;
       return chai.request(app)
         .get('/api/notes')
@@ -48,7 +54,6 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('array');
-          expect(res.body).to.have.length.of.at.least(1);
 
           return Note.find()
             .then(function(data) {
@@ -59,33 +64,40 @@ describe('Notes API resource', function() {
    
     //test for getting one note
     it('should return the correct note given id', function () {
-      
+
       let data;
-      
       // Call the database
       return Note.findOne()
         .then(_data => {
           data = _data;
-         // console.log(data.folderId);
-
-          // make request to route
+          // console.log(data.folderId);
           return chai.request(app).get(`/api/notes/${data.id}`);
         })
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
-
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.keys('id','title','content', 'folderId', 'createdAt', 'updatedAt');
-
-          // compare response
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
-         // expect(res.body.folderId).to.equal(data.folderId);
-          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
-          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+          // expect(res.body.folderId).to.equal(data.folderId);
 
+        });
+    });
+
+
+    //test for getting folderId from querystring
+    it('should return the correct folder given valid querystring for folderId', function() {
+      let data;
+      Note.findOne()
+        .then(_data => {
+          data=_data;
+          return chai.request(app).get(`/api/notes?folderId=${data.folderId}`);  
+        }) 
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
         });
     });
 
@@ -101,8 +113,6 @@ describe('Notes API resource', function() {
           expect(res).to.have.status(400);
         });
     });
-
-
   });
 
 
@@ -135,6 +145,7 @@ describe('Notes API resource', function() {
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
 
     it('should return 400 if sent bad/missing fields and info', function() {
     
